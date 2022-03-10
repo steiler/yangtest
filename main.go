@@ -9,9 +9,16 @@ import (
 )
 
 func main() {
+
+	// First lets prepare some stuff.
+	// retieve a simple very small config, which we consider the actual config
+	// this would be cached in the controller and probably come from an array, in which all the configs are stored / cached.
 	actualConfig := getActual()
+	// retrieve a config snippet defining a subinterface as well as the network-instance as default for the /system/ssh-server
+	// this would be the spec with which the controller would be triggered
 	specConfig := getSpec()
 
+	// lets start our "fake" reconsiliation
 	DoComparisonAndPathEvaluation(actualConfig, specConfig)
 }
 
