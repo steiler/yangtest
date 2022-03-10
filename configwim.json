@@ -1,0 +1,162 @@
+{
+    "interface": [
+        {
+			"admin-state": "enable",
+			"name": "mgmt0",
+			"subinterface": [
+				{
+					"admin-state": "enable",
+					"index": 0,
+					"ipv4": {
+						"dhcp-client": {}
+					},
+					"ipv6": {
+						"dhcp-client": {}
+					}
+				}
+			]
+		},
+        {
+            "name": "ethernet-1/49",
+            "admin-state": "enable",
+            "subinterface": [
+                {
+                    "index": 1,
+                    "type": "routed",
+                    "admin-state": "enable",
+                    "description": "ndd-e1-49-0-leaf1",
+                    "ipv4": {
+                        "address": [
+                            {
+                                "ip-prefix": "100.64.0.0/31"
+                            }
+                        ]
+                    },
+                    "ipv6": {
+                        "address": [
+                            {
+                                "ip-prefix": "3100:64::/127"
+                            }
+                        ]
+                    },
+                    "vlan": {
+                        "encap": {
+                            "single-tagged": {
+                                "vlan-id": 1
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "admin-state": "enable",
+            "description": "test",
+            "name": "ethernet-1/55",
+            "subinterface": [
+                {
+                    "index": 10,
+                    "type": "routed",
+                    "admin-state": "enable",
+                    "description": "ndd-e1-49-0-leaf1",
+                    "ipv4": {
+                        "address": [
+                            {
+                                "ip-prefix": "100.64.0.0/31"
+                            }
+                        ]
+                    },
+                    "ipv6": {
+                        "address": [
+                            {
+                                "ip-prefix": "3100:64::/127"
+                            }
+                        ]
+                    },
+                    "vlan": {
+                        "encap": {
+                            "single-tagged": {
+                                "vlan-id": 1
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "admin-state": "enable",
+            "description": "ndd-ethernet-1/50",
+            "name": "ethernet-1/50",
+            "vlan-tagging":true
+        },
+        {
+            "admin-state": "enable",
+            "name": "ethernet-1/51",
+            "description": "ndd-ethernet-1/51",
+            "subinterface": [
+                {
+                    "index": 10,
+                    "type": "routed",
+                    "admin-state": "enable",
+                    "description": "ndd-e1-49-0-leaf1",
+                    "ipv4": {
+                        "address": [
+                            {
+                                "ip-prefix": "100.64.0.0/31"
+                            }
+                        ]
+                    },
+                    "ipv6": {
+                        "address": [
+                            {
+                                "ip-prefix": "3100:64::/127"
+                            }
+                        ]
+                    },
+                    "vlan": {
+                        "encap": {
+                            "single-tagged": {
+                                "vlan-id": 1
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "tunnel-interface": [
+        {
+            "name": "vxlan0"
+        }
+    ],
+    "network-instance": [
+		{
+			"admin-state": "enable",
+			"description": "Management network instance",
+			"interface": [
+				{
+					"name": "mgmt0.0"
+				}
+			],
+			"name": "mgmt",
+			"protocols": {
+				"srl_nokia-linux:linux": {
+					"export-neighbors": true,
+					"export-routes": true,
+					"import-routes": true
+				}
+			},
+			"type": "ip-vrf"
+		}
+	],
+    "system": {
+        "ssh-server": {
+			"network-instance": [
+				{
+					"admin-state": "enable",
+					"name": "mgmt"
+				}
+			]
+		}
+    }
+}

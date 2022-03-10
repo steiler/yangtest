@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	ygotsrl "steiler/yangtest/generated"
 
 	"github.com/openconfig/gnmi/proto/gnmi"
@@ -47,6 +48,21 @@ func getActual() *ygotsrl.Device {
 		   }
 		]
 	 }`
+
+	dx := &ygotsrl.Device{}
+
+	ygotsrl.Unmarshal([]byte(config), dx)
+	dx.GetOrCreateNetworkInstance("default")
+
+	return dx
+}
+
+func loadConfigFromFile(filename string) *ygotsrl.Device {
+
+	config, err := os.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
 
 	dx := &ygotsrl.Device{}
 

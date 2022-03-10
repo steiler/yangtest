@@ -5,6 +5,7 @@ import (
 	ygotsrl "steiler/yangtest/generated"
 
 	"github.com/openconfig/gnmi/proto/gnmi"
+	"github.com/openconfig/goyang/pkg/yang"
 	"github.com/openconfig/ygot/ygot"
 )
 
@@ -13,10 +14,10 @@ func main() {
 	// First lets prepare some stuff.
 	// retieve a simple very small config, which we consider the actual config
 	// this would be cached in the controller and probably come from an array, in which all the configs are stored / cached.
-	actualConfig := getActual()
+	actualConfig := &ygotsrl.Device{}
 	// retrieve a config snippet defining a subinterface as well as the network-instance as default for the /system/ssh-server
 	// this would be the spec with which the controller would be triggered
-	specConfig := getSpec()
+	specConfig := loadConfigFromFile("/home/steiler/projects/yangtest/configwim.json")
 
 	// lets start our "fake" reconsiliation
 	DoComparisonAndPathEvaluation(actualConfig, specConfig)
@@ -79,13 +80,20 @@ func DoComparisonAndPathEvaluation(actualConfig *ygotsrl.Device, specConfig *ygo
 // Or put it, returns the absolute path to the root of the elements which will be touched in the gnmi.Notification.
 func CarveOutRelevantSubPaths(gn *gnmi.Notification) []*gnmi.Path {
 
+	rootSchema := getRootSchema()
+
 	allSpecSignificantPaths := []*gnmi.Path{}
 
 	// Deletes are all significant so we add them straight
 	allSpecSignificantPaths = append(allSpecSignificantPaths, gn.GetDelete()...)
 
 	for _, elem := range gn.GetUpdate() {
-		allSpecSignificantPaths = append(allSpecSignificantPaths, elem.Path)
+		// for each update check that it is no default value, we want to skip those.
+		schemaEntry := getSchemaEntry(rootSchema, elem)
+		// make sure we are not addind paths with default values or path which are keys
+		if !isDefaultValue(schemaEntry, elem) && !isKeyValue(schemaEntry, elem) {
+			allSpecSignificantPaths = append(allSpecSignificantPaths, elem.Path)
+		}
 	}
 
 	// aggregate the deduced paths to find the common relevant base paths
@@ -94,19 +102,31 @@ func CarveOutRelevantSubPaths(gn *gnmi.Notification) []*gnmi.Path {
 	return AggregateSpecSignificantPaths
 }
 
-/* func referencesOnlyKeyInList(gp *gnmi.Path) bool {
-	if len(gp.Elem) > 1 {
-		length := len(gp.Elem)
-		lastElem := gp.Elem[length-1]
-		priorToLastElem := gp.Elem[length-2]
-		_, exists := priorToLastElem.Key[lastElem.Name]
-		return exists
+func getSchemaEntry(rootschema *yang.Entry, u *gnmi.Update) *yang.Entry {
+	var schema = rootschema
+	for _, elem := range u.Path.Elem {
+		schema = schema.Dir[elem.Name]
+	}
+	return schema
+}
+func isKeyValue(schemaEntry *yang.Entry, u *gnmi.Update) bool {
+	return schemaEntry.Parent.Key == u.Path.Elem[len(u.Path.Elem)-1].Name
+}
+
+func isDefaultValue(schemaEntry *yang.Entry, u *gnmi.Update) bool {
+	if defval, singleDefVal := schemaEntry.SingleDefaultValue(); singleDefVal {
+		if u.Val.GetStringVal() == defval {
+			return true
+		} else {
+			return false
+		}
 	}
 	return false
-} */
+}
 
 //
 func aggregateCommonPaths(p []*gnmi.Path) []*gnmi.Path {
+	// we add the first path straight away to the list, therrefore make sure we have at least 1 entry in the list
 	result := []*gnmi.Path{}
 	if len(p) == 0 {
 		return result
@@ -175,4 +195,14 @@ func pathElemIsEqual(a, b *gnmi.PathElem) bool {
 		}
 	}
 	return true
+}
+
+func getRootSchema() *yang.Entry {
+	schema, err := ygotsrl.Schema()
+	if err != nil {
+		panic(err)
+	}
+
+	deviceSchema := schema.RootSchema()
+	return deviceSchema
 }
