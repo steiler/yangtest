@@ -57,6 +57,14 @@ func getActual() *ygotsrl.Device {
 	return dx
 }
 
+func appendE150(config *ygotsrl.Device) {
+	if50, err := createInterfaceWithIP("ethernet-1/50", "myDescription", 55, "192.168.5.2/24")
+	if err != nil {
+		panic(err)
+	}
+	config.AppendInterface(if50)
+}
+
 func loadConfigFromFile(filename string) *ygotsrl.Device {
 
 	config, err := os.ReadFile(filename)
