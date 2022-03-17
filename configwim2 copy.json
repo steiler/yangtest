@@ -1,0 +1,254 @@
+{
+    "interface": [
+       {
+          "admin-state": "enable",
+          "description": "ndd-infraethernet-1/49",
+          "name": "ethernet-1/49",
+          "subinterface": [
+             {
+                "admin-state": "enable",
+                "description": "ndd-infraethernet-1/49",
+                "index": 0,
+                "ipv4": {
+                   "address": [
+                      {
+                         "ip-prefix": "100.66.48.97/31"
+                      }
+                   ]
+                },
+                "ipv6": {
+                   "address": [
+                      {
+                         "ip-prefix": "1000:66:48::97/127"
+                      }
+                   ]
+                }
+             }
+          ]
+       },
+       {
+          "admin-state": "enable",
+          "description": "ndd-infraethernet-1/50",
+          "name": "ethernet-1/50",
+          "subinterface": [
+             {
+                "admin-state": "enable",
+                "description": "ndd-infraethernet-1/50",
+                "index": 0,
+                "ipv4": {
+                   "address": [
+                      {
+                         "ip-prefix": "100.66.49.99/31"
+                      }
+                   ]
+                },
+                "ipv6": {
+                   "address": [
+                      {
+                         "ip-prefix": "1000:66:49::99/127"
+                      }
+                   ]
+                }
+             }
+          ]
+       },
+       {
+          "description": "ndd-infrairb0",
+          "name": "irb0"
+       },
+       {
+          "name": "system0",
+          "subinterface": [
+             {
+                "description": "ndd-infra-system0",
+                "index": 0,
+                "ipv4": {
+                   "address": [
+                      {
+                         "ip-prefix": "100.64.0.2/32"
+                      }
+                   ]
+                },
+                "ipv6": {
+                   "address": [
+                      {
+                         "ip-prefix": "1000:64::2/128"
+                      }
+                   ]
+                }
+             }
+          ]
+       }
+    ],
+    "network-instance": [
+       {
+          "admin-state": "enable",
+          "description": "ndd-infra-default",
+          "interface": [
+             {
+                "name": "ethernet-1/49.0"
+             },
+             {
+                "name": "ethernet-1/50.0"
+             },
+             {
+                "name": "system0.0"
+             }
+          ],
+          "name": "default",
+          "protocols": {
+             "bgp": {
+                "admin-state": "enable",
+                "autonomous-system": 65002,
+                "ebgp-default-policy": {
+                   "export-reject-all": false,
+                   "import-reject-all": false
+                },
+                "evpn": {
+                   "admin-state": "enable"
+                },
+                "group": [
+                   {
+                      "admin-state": "enable",
+                      "evpn": {
+                         "admin-state": "enable"
+                      },
+                      "group-name": "overlay"
+                   },
+                   {
+                      "admin-state": "enable",
+                      "evpn": {
+                         "admin-state": "enable"
+                      },
+                      "export-policy": "export-local",
+                      "group-name": "underlay",
+                      "ipv4-unicast": {
+                         "admin-state": "enable"
+                      },
+                      "ipv6-unicast": {
+                         "admin-state": "enable"
+                      },
+                      "next-hop-self": true
+                   }
+                ],
+                "ipv4-unicast": {
+                   "admin-state": "enable",
+                   "multipath": {
+                      "allow-multiple-as": true,
+                      "max-paths-level-1": 64,
+                      "max-paths-level-2": 64
+                   }
+                },
+                "ipv6-unicast": {
+                   "admin-state": "enable",
+                   "multipath": {
+                      "allow-multiple-as": true,
+                      "max-paths-level-1": 64,
+                      "max-paths-level-2": 64
+                   }
+                },
+                "neighbor": [
+                   {
+                      "admin-state": "enable",
+                      "local-as": [
+                         {
+                            "as-number": 65002
+                         }
+                      ],
+                      "peer-address": "100.66.48.96",
+                      "peer-as": 65001,
+                      "peer-group": "underlay",
+                      "transport": {
+                         "local-address": "100.66.48.97"
+                      }
+                   },
+                   {
+                      "admin-state": "enable",
+                      "local-as": [
+                         {
+                            "as-number": 65002
+                         }
+                      ],
+                      "peer-address": "100.66.49.98",
+                      "peer-as": 65001,
+                      "peer-group": "underlay",
+                      "transport": {
+                         "local-address": "100.66.49.99"
+                      }
+                   }
+                ],
+                "router-id": "100.64.0.2"
+             }
+          },
+          "type": "default"
+       }
+    ],
+    "routing-policy": {
+       "policy": [
+          {
+             "name": "export-local",
+             "statement": [
+                {
+                   "match": {
+                      "prefix-set": "local-ipv4"
+                   },
+                   "sequence-id": 10
+                },
+                {
+                   "match": {
+                      "prefix-set": "local-ipv6"
+                   },
+                   "sequence-id": 20
+                }
+             ]
+          }
+       ],
+       "prefix-set": [
+          {
+             "name": "local-ipv4",
+             "prefix": [
+                {
+                   "ip-prefix": "100.64.0.0/24",
+                   "mask-length-range": "32..32"
+                }
+             ]
+          },
+          {
+             "name": "local-ipv6",
+             "prefix": [
+                {
+                   "ip-prefix": "1000:64::/64",
+                   "mask-length-range": "128..128"
+                }
+             ]
+          }
+       ]
+    },
+    "system": {
+       "network-instance": {
+          "protocols": {
+             "bgp-vpn": {
+                "bgp-instance": [
+                   {
+                      "id": 1
+                   }
+                ]
+             },
+             "evpn": {
+                "ethernet-segments": {
+                   "bgp-instance": [
+                      {
+                         "id": 1
+                      }
+                   ]
+                }
+             }
+          }
+       }
+    },
+    "tunnel-interface": [
+       {
+          "name": "vxlan0"
+       }
+    ]
+ }

@@ -1,0 +1,27 @@
+{
+   "interface": [
+      {
+         "name": "system0",
+         "subinterface": [
+            {
+               "description": "ndd-infra-system0",
+               "index": 0,
+               "ipv4": {
+                  "address": [
+                     {
+                        "ip-prefix": "100.64.0.2/32"
+                     }
+                  ]
+               },
+               "ipv6": {
+                  "address": [
+                     {
+                        "ip-prefix": "1000:64::2/128"
+                     }
+                  ]
+               }
+            }
+         ]
+      }
+   ]
+}

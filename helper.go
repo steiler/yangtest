@@ -126,3 +126,10 @@ func createInterfaceWithIP(name string, description string, subIfIndex uint32, i
 	return interf, nil
 
 }
+
+func bool2string(b bool) string {
+	if b {
+		return "true"
+	}
+	return "false"
+}

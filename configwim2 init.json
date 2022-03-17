@@ -1,0 +1,18 @@
+{
+   "interface": [
+      {
+         "name": "system0",
+         "admin-state": "enable"
+      },
+      {
+         "name": "mgmt0",
+         "subinterface": [
+            {
+               "admin-state": "enable",
+               "description": "ndd-infraethernet-1/49",
+               "index": 0
+            }
+         ]
+      }
+   ]
+}
