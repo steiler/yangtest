@@ -1,0 +1,411 @@
+{
+    "interface": [
+        {
+            "admin-state": "enable",
+            "name": "ethernet-1/48",
+            "subinterface": [
+                {
+                    "admin-state": "enable",
+                    "index": 100,
+                    "ipv4": {
+                        "address": [
+                            {
+                                "ip-prefix": "100.112.10.1/31"
+                            }
+                        ],
+                        "allow-directed-broadcast": false
+                    },
+                    "ipv6": {
+                        "address": [
+                            {
+                                "ip-prefix": "2a02:1800:80:7050::1/64"
+                            }
+                        ]
+                    },
+                    "type": "routed",
+                    "vlan": {
+                        "encap": {
+                            "single-tagged": {
+                                "vlan-id": 100
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "admin-state": "enable",
+            "name": "irb0",
+            "subinterface": [
+                {
+                    "admin-state": "enable",
+                    "anycast-gw": {
+                        "virtual-router-id": 1
+                    },
+                    "index": 1386,
+                    "ipv4": {
+                        "address": [
+                            {
+                                "anycast-gw": true,
+                                "ip-prefix": "100.112.3.1/24"
+                            }
+                        ],
+                        "allow-directed-broadcast": false,
+                        "arp": {
+                            "duplicate-address-detection": true,
+                            "evpn": {
+                                "advertise": [
+                                    {
+                                        "admin-tag": 0,
+                                        "route-type": "dynamic"
+                                    }
+                                ]
+                            },
+                            "host-route": {
+                                "populate": [
+                                    {
+                                        "route-type": "dynamic"
+                                    }
+                                ]
+                            },
+                            "learn-unsolicited": true,
+                            "timeout": 14400
+                        }
+                    },
+                    "ipv6": {
+                        "address": [
+                            {
+                                "ip-prefix": "2a02:1800:83:7000::1/64"
+                            }
+                        ],
+                        "neighbor-discovery": {
+                            "duplicate-address-detection": true,
+                            "evpn": {
+                                "advertise": [
+                                    {
+                                        "admin-tag": 0,
+                                        "route-type": "dynamic"
+                                    }
+                                ]
+                            },
+                            "host-route": {
+                                "populate": [
+                                    {
+                                        "route-type": "dynamic"
+                                    }
+                                ]
+                            },
+                            "learn-unsolicited": "global",
+                            "reachable-time": 30,
+                            "stale-time": 14400
+                        }
+                    }
+                },
+                {
+                    "admin-state": "enable",
+                    "index": 2105
+                },
+                {
+                    "admin-state": "enable",
+                    "index": 2106
+                },
+                {
+                    "admin-state": "enable",
+                    "index": 2143
+                }
+            ]
+        },
+        {
+            "admin-state": "enable",
+            "name": "lag1",
+            "subinterface": [
+                {
+                    "admin-state": "enable",
+                    "index": 100,
+                    "type": "bridged",
+                    "vlan": {
+                        "encap": {
+                            "single-tagged": {
+                                "vlan-id": 100
+                            }
+                        }
+                    }
+                },
+                {
+                    "admin-state": "enable",
+                    "index": 102,
+                    "type": "bridged",
+                    "vlan": {
+                        "encap": {
+                            "single-tagged": {
+                                "vlan-id": 102
+                            }
+                        }
+                    }
+                },
+                {
+                    "admin-state": "enable",
+                    "index": 200,
+                    "type": "bridged",
+                    "vlan": {
+                        "encap": {
+                            "single-tagged": {
+                                "vlan-id": 200
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "network-instance": [
+        {
+            "admin-state": "enable",
+            "bridge-table": {
+                "discard-unknown-dest-mac": false,
+                "mac-learning": {
+                    "admin-state": "enable"
+                },
+                "protect-anycast-gw-mac": false
+            },
+            "interface": [
+                {
+                    "name": "irb0.2143"
+                },
+                {
+                    "name": "lag1.100"
+                }
+            ],
+            "name": "multus-ipvlan-bridged",
+            "protocols": {
+                "bgp-evpn": {
+                    "bgp-instance": [
+                        {
+                            "admin-state": "enable",
+                            "default-admin-tag": 0,
+                            "ecmp": 2,
+                            "encapsulation-type": "vxlan",
+                            "evi": 2143,
+                            "id": 1,
+                            "vxlan-interface": "vxlan0.2143"
+                        }
+                    ]
+                },
+                "bgp-vpn": {
+                    "bgp-instance": [
+                        {
+                            "id": 1,
+                            "route-target": {
+                                "export-rt": "target:65555:2143",
+                                "import-rt": "target:65555:2143"
+                            }
+                        }
+                    ]
+                }
+            },
+            "type": "mac-vrf",
+            "vxlan-interface": [
+                {
+                    "name": "vxlan0.2143"
+                }
+            ]
+        },
+        {
+            "admin-state": "enable",
+            "interface": [
+                {
+                    "name": "ethernet-1/48.100"
+                },
+                {
+                    "name": "irb0.1386"
+                }
+            ],
+            "ip-forwarding": {
+                "receive-ipv4-check": true,
+                "receive-ipv6-check": true
+            },
+            "name": "multus-routed",
+            "protocols": {
+                "bgp-evpn": {
+                    "bgp-instance": [
+                        {
+                            "admin-state": "enable",
+                            "default-admin-tag": 0,
+                            "ecmp": 2,
+                            "encapsulation-type": "vxlan",
+                            "evi": 1386,
+                            "id": 1,
+                            "vxlan-interface": "vxlan0.1386"
+                        }
+                    ]
+                },
+                "bgp-vpn": {
+                    "bgp-instance": [
+                        {
+                            "id": 1,
+                            "route-target": {
+                                "export-rt": "target:65555:1386",
+                                "import-rt": "target:65555:1386"
+                            }
+                        }
+                    ]
+                }
+            },
+            "type": "ip-vrf",
+            "vxlan-interface": [
+                {
+                    "name": "vxlan0.1386"
+                }
+            ]
+        },
+        {
+            "admin-state": "enable",
+            "bridge-table": {
+                "discard-unknown-dest-mac": false,
+                "mac-learning": {
+                    "admin-state": "enable"
+                },
+                "protect-anycast-gw-mac": false
+            },
+            "interface": [
+                {
+                    "name": "irb0.2105"
+                },
+                {
+                    "name": "lag1.200"
+                }
+            ],
+            "name": "multus-sriov1-bridged",
+            "protocols": {
+                "bgp-evpn": {
+                    "bgp-instance": [
+                        {
+                            "admin-state": "enable",
+                            "default-admin-tag": 0,
+                            "ecmp": 2,
+                            "encapsulation-type": "vxlan",
+                            "evi": 2105,
+                            "id": 1,
+                            "vxlan-interface": "vxlan0.2105"
+                        }
+                    ]
+                },
+                "bgp-vpn": {
+                    "bgp-instance": [
+                        {
+                            "id": 1,
+                            "route-target": {
+                                "export-rt": "target:65555:2105",
+                                "import-rt": "target:65555:2105"
+                            }
+                        }
+                    ]
+                }
+            },
+            "type": "mac-vrf",
+            "vxlan-interface": [
+                {
+                    "name": "vxlan0.2105"
+                }
+            ]
+        },
+        {
+            "admin-state": "enable",
+            "bridge-table": {
+                "discard-unknown-dest-mac": false,
+                "mac-learning": {
+                    "admin-state": "enable"
+                },
+                "protect-anycast-gw-mac": false
+            },
+            "interface": [
+                {
+                    "name": "irb0.2106"
+                },
+                {
+                    "name": "lag1.102"
+                }
+            ],
+            "name": "multus-sriov2-bridged",
+            "protocols": {
+                "bgp-evpn": {
+                    "bgp-instance": [
+                        {
+                            "admin-state": "enable",
+                            "default-admin-tag": 0,
+                            "ecmp": 2,
+                            "encapsulation-type": "vxlan",
+                            "evi": 2106,
+                            "id": 1,
+                            "vxlan-interface": "vxlan0.2106"
+                        }
+                    ]
+                },
+                "bgp-vpn": {
+                    "bgp-instance": [
+                        {
+                            "id": 1,
+                            "route-target": {
+                                "export-rt": "target:65555:2106",
+                                "import-rt": "target:65555:2106"
+                            }
+                        }
+                    ]
+                }
+            },
+            "type": "mac-vrf",
+            "vxlan-interface": [
+                {
+                    "name": "vxlan0.2106"
+                }
+            ]
+        }
+    ],
+    "tunnel-interface": [
+        {
+            "name": "vxlan0",
+            "vxlan-interface": [
+                {
+                    "egress": {
+                        "source-ip": "use-system-ipv4-address"
+                    },
+                    "index": 1386,
+                    "ingress": {
+                        "vni": 1386
+                    },
+                    "type": "routed"
+                },
+                {
+                    "egress": {
+                        "source-ip": "use-system-ipv4-address"
+                    },
+                    "index": 2105,
+                    "ingress": {
+                        "vni": 2105
+                    },
+                    "type": "bridged"
+                },
+                {
+                    "egress": {
+                        "source-ip": "use-system-ipv4-address"
+                    },
+                    "index": 2106,
+                    "ingress": {
+                        "vni": 2106
+                    },
+                    "type": "bridged"
+                },
+                {
+                    "egress": {
+                        "source-ip": "use-system-ipv4-address"
+                    },
+                    "index": 2143,
+                    "ingress": {
+                        "vni": 2143
+                    },
+                    "type": "bridged"
+                }
+            ]
+        }
+    ]
+}

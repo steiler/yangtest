@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	ygotsrl "steiler/yangtest/generated"
+	ygotsrl "steiler/yangtest/generated/srl"
 
 	"github.com/openconfig/gnmi/proto/gnmi"
 	"github.com/openconfig/ygot/ygot"
@@ -125,11 +125,4 @@ func createInterfaceWithIP(name string, description string, subIfIndex uint32, i
 	interf.AppendSubinterface(suif)
 	return interf, nil
 
-}
-
-func bool2string(b bool) string {
-	if b {
-		return "true"
-	}
-	return "false"
 }

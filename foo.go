@@ -2,78 +2,11 @@ package main
 
 import (
 	"fmt"
-	ygotsrl "steiler/yangtest/generated"
+	ygotsrl "steiler/yangtest/generated/srl"
 
 	"github.com/openconfig/gnmi/proto/gnmi"
 	"github.com/openconfig/ygot/ygot"
 )
-
-func OtherExample() {
-
-	d1 := &ygotsrl.Device{}
-
-	d2 := &ygotsrl.Device{}
-
-	// if31, err := d1.NewInterface("ethernet-1/3")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// _ = if31
-
-	if3, err := d2.NewInterface("ethernet-1/3")
-	if err != nil {
-		panic(err)
-	}
-	if3.AdminState = ygotsrl.SrlNokiaCommon_AdminState_enable
-	if3.VlanTagging = ygot.Bool(true)
-
-	sif3, err := if3.NewSubinterface(5)
-	if err != nil {
-		panic(err)
-	}
-	vlan := sif3.GetOrCreateVlan()
-
-	enc := vlan.GetOrCreateEncap() //.SingleTagged.VlanId = ygotsrl.UnionUint16(5)
-	enc.GetOrCreateSingleTagged().VlanId = ygotsrl.UnionUint16(5)
-
-	sif3.GetOrCreateIpv4().NewAddress("192.168.3.1/24")
-
-	gnmin, err := ygot.Diff(d1, d2)
-	if err != nil {
-		panic(err)
-	}
-
-	_ = gnmin
-
-	printGnmiNotification(gnmin)
-	fmt.Println("")
-	fmt.Println("xxxxxxxxxxxxx")
-	fmt.Println("")
-	relevantPaths := CarveOutRelevantSubPaths(gnmin)
-
-	for _, rp := range relevantPaths {
-		fmt.Println(rp.String())
-	}
-
-	err = d1.Validate()
-	if err != nil {
-		panic(err)
-	}
-	err = d2.Validate()
-	if err != nil {
-		panic(err)
-	}
-
-	err = ygot.MergeStructInto(d2, d1)
-	if err != nil {
-		panic(err)
-	}
-
-	// ################################################
-
-	printSRL(d1)
-
-}
 
 func Test1() {
 	d := &ygotsrl.Device{}
@@ -203,64 +136,4 @@ func configFromString() *ygotsrl.Device {
 	ygotsrl.Unmarshal([]byte(config), dx)
 
 	return dx
-}
-
-func complexMergeDiff() {
-	d1 := configFromString()
-	d2tmp, err := ygot.DeepCopy(d1)
-	d2 := d2tmp.(*ygotsrl.Device)
-
-	if err != nil {
-		panic(err)
-	}
-	if3, err := d2.NewInterface("ethernet-1/3")
-	if err != nil {
-		panic(err)
-	}
-
-	if3.VlanTagging = ygot.Bool(true)
-
-	sif3, err := if3.NewSubinterface(5)
-	if err != nil {
-		panic(err)
-	}
-	vlan := sif3.GetOrCreateVlan()
-
-	enc := vlan.GetOrCreateEncap() //.SingleTagged.VlanId = ygotsrl.UnionUint16(5)
-	enc.GetOrCreateSingleTagged().VlanId = ygotsrl.UnionUint16(5)
-
-	sif3.GetOrCreateIpv4().NewAddress("192.168.3.1/24")
-
-	gnmin, err := ygot.Diff(d2, d1)
-	if err != nil {
-		panic(err)
-	}
-
-	_ = gnmin
-
-	printGnmiNotification(gnmin)
-
-	relevantPaths := CarveOutRelevantSubPaths(gnmin)
-
-	for _, rp := range relevantPaths {
-		fmt.Println(rp.String())
-	}
-
-	err = d1.Validate()
-	if err != nil {
-		panic(err)
-	}
-	err = d2.Validate()
-	if err != nil {
-		panic(err)
-	}
-
-	err = ygot.MergeStructInto(d1, d2)
-	if err != nil {
-		panic(err)
-	}
-
-	// ################################################
-
-	printSRL(d1)
 }

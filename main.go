@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
-	ygotsrl "steiler/yangtest/generated"
 
-	"github.com/openconfig/gnmi/proto/gnmi"
-	"github.com/openconfig/goyang/pkg/yang"
-	ygotutils "github.com/openconfig/ygot/util"
+	ygotsrl "steiler/yangtest/generated/srl"
+	"steiler/yangtest/generated/sros"
+
 	"github.com/openconfig/ygot/ygot"
 )
 
 func main() {
+	srosDevice := &ygotsros.Device{}
+}
 
+func old_main() {
 	// First lets prepare some stuff.
 	// retieve a simple very small config, which we consider the actual config
 	// this would be cached in the controller and probably come from an array, in which all the configs are stored / cached.
@@ -24,7 +26,7 @@ func main() {
 	// retrieve a config snippet defining a subinterface as well as the network-instance as default for the /system/ssh-server
 	// this would be the spec with which the controller would be triggered
 	//specConfig := loadConfigFromFile("/home/steiler/projects/yangtest/configwim2 copy.json")
-	specConfig := loadConfigFromFile("/home/steiler/projects/yangtest/configwim2 copy.json")
+	specConfig := loadConfigFromFile("/home/steiler/projects/yangtest/configwim3.json")
 
 	// lets start our "fake" reconsiliation
 	DoComparisonAndPathEvaluation(actualConfig, specConfig)
@@ -70,24 +72,29 @@ func DoComparisonAndPathEvaluation(actualConfig *ygotsrl.Device, specConfig *ygo
 	fmt.Println("")
 
 	// calculate the relevant paths (As wim calls them, Root Paths)
-	_ = CarveOutRelevantSubPaths(actualVsSpecDiff)
+	//_ = CarveOutRelevantSubPaths(actualVsSpecDiff)
 
 	fmt.Println("Relevant Hier-Paths:")
-	printGnmiPaths(rootCE.getRootPaths())
 
-	//fmt.Println("Relevant Paths:")
-	//printGnmiPaths(relevantPaths)
-	//fmt.Println("")
+	// get Root Schema
+	// schema, err := ygotsrl.Schema()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// deviceSchema := schema.RootSchema()
+
+	// Feed schema and diff *gnmi.Update into rootpath library
+	//rootConfigElement := rootpaths.ConfigElementHierarchyFromGnmiUpdate(deviceSchema, actualVsSpecDiff)
+
+	// // get and print Rootpaths
+	// printGnmiPaths(rootConfigElement.GetRootPaths())
+
+	// fmt.Println(rootConfigElement.GetHierarchicalOutput(" "))
 
 	fmt.Println("All good, made it to the end!")
 }
 
-type PathAndSchema struct {
-	path   *gnmi.Path
-	schema *yang.Entry
-}
-
-// Carve out the sub-paths that have a specific relevance from a gnmi.Notification.
+/* // Carve out the sub-paths that have a specific relevance from a gnmi.Notification.
 //
 // We go down the tree to find the paths where values are actually changed or deleted
 // and returns a list of these gnmi.Path's in an aggregated way.
@@ -118,18 +125,9 @@ func CarveOutRelevantSubPaths(gn *gnmi.Notification) []*gnmi.Path {
 
 	return append(gn.GetDelete())
 }
+*/
 
-// runs from schema root through to the schema element that the gnmi.Update referes to
-// and returns the corresponding *yang.Entry.
-func getPathAndSchemaEntry(rootschema *yang.Entry, u *gnmi.Path) *PathAndSchema {
-	var schema = rootschema
-	for _, elem := range u.Elem {
-		schema = schema.Dir[elem.Name]
-	}
-	return &PathAndSchema{path: u, schema: schema}
-}
-
-// checks if the provided gnmi.Update just sets the key for the corresponding entry or any other related data.
+/* // checks if the provided gnmi.Update just sets the key for the corresponding entry or any other related data.
 func isKeyValue(schemaEntry *yang.Entry, u *gnmi.Update) bool {
 	return schemaEntry.Parent.Key == u.Path.Elem[len(u.Path.Elem)-1].Name
 }
@@ -140,17 +138,8 @@ func isDefaultValue(schemaEntry *yang.Entry, u *gnmi.Update) bool {
 		return u.Val.GetStringVal() == defval
 	}
 	return false
-}
-
-type PathAndSchemaCount struct {
-	*PathAndSchema
-	count uint
-}
-
-func (pasc *PathAndSchemaCount) String() string {
-	return fmt.Sprintf("Count: %d, Path: %s", pasc.count, pasc.path.String())
-}
-
+} */
+/*
 // aggregates the proivided paths by extratcting relevant paths
 func aggregateCommonPaths(p []*PathAndSchema, rootSchema *yang.Entry) []*PathAndSchemaCount {
 	// we add the first path straight away to the list, therrefore make sure we have at least 1 entry in the list
@@ -183,21 +172,4 @@ func aggregateCommonPaths(p []*PathAndSchema, rootSchema *yang.Entry) []*PathAnd
 		}
 	}
 	return result
-}
-
-// returns a pointer to the srlygot root schema for later processing
-func getRootSchema() *yang.Entry {
-	schema, err := ygotsrl.Schema()
-	if err != nil {
-		panic(err)
-	}
-
-	deviceSchema := schema.RootSchema()
-	return deviceSchema
-}
-
-// func test() {
-// 	d := loadConfigFromFile("/home/steiler/projects/yangtest/configwim2 init.json")
-
-// 	fmt.Println(ygotutils.DataSchemaTreesString(getRootSchema(), d))
-// }
+} */
